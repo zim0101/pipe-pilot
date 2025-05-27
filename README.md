@@ -19,7 +19,7 @@
 **The ultimate AI-powered DevOps automation tool that transforms any GitHub repository into a production-ready Jenkins CI/CD pipeline in minutes!**
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Python 3.12+](https://img.shields.io/badge/python-3.8+-blue.svg)
+![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)
 ![Jenkins](https://img.shields.io/badge/Jenkins-2.400+-orange.svg)
 ![AI Powered](https://img.shields.io/badge/AI-Powered-green.svg)
 
