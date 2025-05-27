@@ -71,6 +71,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 # Set up environment
+cp .env.example .env
 vim .env
 or 
 touch .env
