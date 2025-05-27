@@ -14,6 +14,8 @@
 ║                                                                               ║
 ║              🚀 AI-Powered Jenkins Pipeline Generator 🚀                      ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝
+
+🙏 Special thanks to Dynamic Solution Innovators Ltd. for organizing the AI Hackathon that inspired and enabled this project. 💡
 ```
 
 **The ultimate AI-powered DevOps automation tool that transforms any GitHub repository into a production-ready Jenkins CI/CD pipeline in minutes!**
