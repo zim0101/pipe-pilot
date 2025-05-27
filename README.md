@@ -19,7 +19,7 @@
 **The ultimate AI-powered DevOps automation tool that transforms any GitHub repository into a production-ready Jenkins CI/CD pipeline in minutes!**
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)
+![Python 3.12+](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![Jenkins](https://img.shields.io/badge/Jenkins-2.400+-orange.svg)
 ![AI Powered](https://img.shields.io/badge/AI-Powered-green.svg)
 
@@ -51,7 +51,7 @@ Pipe Pilot is a revolutionary AI-powered tool that automatically generates compl
 
 ### Prerequisites
 
-- **Python 3.8+** 
+- **Python 3.12+** 
 - **Git** configured with SSH keys
 - **Jenkins 2.400+** running locally or remotely
 - **OpenRouter API Key** ([Get free key](https://openrouter.ai/))
@@ -60,14 +60,21 @@ Pipe Pilot is a revolutionary AI-powered tool that automatically generates compl
 
 ```bash
 # Clone the repository
-git clone https://github.com/zim0101/ai-jenkins-pipeline-agent.git
-cd ai-jenkins-pipeline-agent
+git clone git@github.com:zim0101/pipe-pilot.git
+cd pipe-pilot
+
+# Create virtual environment and activate
+python3 -m venv .venv
+source .venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Set up environment
 cp .env.example .env
+vim .env
+or 
+touch .env
 ```
 
 ### Configuration
@@ -97,7 +104,7 @@ JENKINS_CLI_JAR=./jenkins-cli.jar
    - Add to `.env` file
 
 2. **Jenkins API Token**:
-   - Go to Jenkins → User → Configure → API Token
+   - Go to Jenkins → User → Security → API Token
    - Generate new token
    - Add to `.env` file
 
@@ -214,18 +221,6 @@ JENKINS_URL=https://jenkins.yourcompany.com
 JENKINS_URL=http://localhost:9090
 ```
 
-### SSH Setup
-
-Pipe Pilot automatically detects SSH configuration:
-
-```bash
-# Ensure SSH keys are loaded
-ssh-add ~/.ssh/id_rsa
-
-# Test GitHub connection
-ssh -T git@github.com
-```
-
 ## 📁 Generated Files
 
 Pipe Pilot creates these files in the `output/` directory:
@@ -258,24 +253,6 @@ curl http://localhost:8080/api/json
 java -jar jenkins-cli.jar -s http://localhost:8080 version
 ```
 
-**SSH Authentication Issues**
-```bash
-# Check SSH agent
-ssh-add -l
-
-# Test GitHub connection
-ssh -T git@github.com
-```
-
-**Git Push Failed**
-```bash
-# Verify SSH keys for GitHub
-ssh -T git@github.com
-
-# Check repository permissions
-git remote -v
-```
-
 ### Debug Mode
 
 Enable verbose output:
@@ -298,19 +275,11 @@ We love contributions! Here's how to help:
 
 ```bash
 # Clone for development
-git clone https://github.com/zim0101/ai-jenkins-pipeline-agent.git
-cd ai-jenkins-pipeline-agent
+git clone git@github.com:zim0101/pipe-pilot.git
+cd pipe-pilot
 
 # Install development dependencies
 pip install -r requirements.txt
-pip install -r requirements-dev.txt
-
-# Run tests
-python -m pytest tests/
-
-# Format code
-black src/
-flake8 src/
 ```
 
 ## 📄 License

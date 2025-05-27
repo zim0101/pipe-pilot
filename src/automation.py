@@ -14,8 +14,7 @@ from jenkins_cli import JenkinsCLIHelper
 class JenkinsAutomation:
     """Handles end-to-end Jenkins automation"""
 
-    def __init__(self, repo_analysis: Dict, output_dir: str,
-                 jenkins_cli_helper: Optional[JenkinsCLIHelper] = None):
+    def __init__(self, repo_analysis: Dict, output_dir: str, jenkins_cli_helper: Optional[JenkinsCLIHelper] = None):
         self.repo_analysis = repo_analysis
         self.output_dir = Path(output_dir)
         self.local_repo_path = Path(repo_analysis['local_path'])
@@ -27,8 +26,7 @@ class JenkinsAutomation:
         print(f"\n🚀 Jenkins Automation Phase")
         print(f"=" * 40)
         print(f"Ready to automate:")
-        print(
-            f"  📁 Repository: {self.repo_analysis['owner']}/{self.repo_analysis['repo_name']}")
+        print(f"  📁 Repository: {self.repo_analysis['owner']}/{self.repo_analysis['repo_name']}")
         print(f"  📂 Local path: {self.local_repo_path}")
         print(f"  📄 Jenkinsfile: {self.output_dir}/Jenkinsfile")
 
@@ -70,32 +68,25 @@ class JenkinsAutomation:
 
         print(f"📊 Repository Status:")
         print(f"   🔸 Current branch: {git_status['current_branch']}")
-        print(
-            f"   🔸 Jenkinsfile exists: {'✅' if git_status['has_jenkinsfile'] else '❌'}")
-        print(
-            f"   🔸 Uncommitted changes: {'✅' if git_status['has_changes'] else '❌'}")
+        print(f"   🔸 Jenkinsfile exists: {'✅' if git_status['has_jenkinsfile'] else '❌'}")
+        print(f"   🔸 Uncommitted changes: {'✅' if git_status['has_changes'] else '❌'}")
 
         # Ask user for confirmation
-        response = input(
-            f"\n📝 Do you want to commit and push the Jenkinsfile? (y/n): ").strip().lower()
+        response = input(f"\n📝 Do you want to commit and push the Jenkinsfile? (y/n): ").strip().lower()
         if response not in ['y', 'yes']:
             print(f"⏭️ Skipping git automation")
             return False
 
         # Determine branching strategy
         if git_status['has_jenkinsfile']:
-            # Jenkinsfile exists, create new branch to avoid conflicts
-            target_branch = "feature/jenkins-ci-cd-pipeline"
-            print(
-                f"⚠️ Jenkinsfile exists, creating new branch: {target_branch}")
-        else:
-            # No Jenkinsfile, safe to commit to current branch
             target_branch = git_status['current_branch']
-            print(f"✅ No Jenkinsfile found, committing to current branch: {target_branch}")
+            print(f"🔄 Jenkinsfile exists, updating on current branch: {target_branch}")
+        else:
+            target_branch = "feature/jenkins-ci-cd-pipeline"
+            print(f"✨ Creating new branch: {target_branch}")
 
         # Execute git operations
-        return self._execute_git_operations(jenkinsfile_source, target_branch,
-                                            git_status)
+        return self._execute_git_operations(jenkinsfile_source, target_branch, git_status)
 
     def job_creation_phase(self) -> bool:
         """Handle Jenkins job creation"""
@@ -124,8 +115,7 @@ class JenkinsAutomation:
 
         # Ask for job name
         suggested_name = f"{self.repo_analysis['repo_name']}-pipeline"
-        job_name = input(
-            f"\n📝 Enter job name (or press Enter for '{suggested_name}'): ").strip()
+        job_name = input(f"\n📝 Enter job name (or press Enter for '{suggested_name}'): ").strip()
         if not job_name:
             job_name = suggested_name
 
@@ -135,8 +125,7 @@ class JenkinsAutomation:
 
         # Warn if job exists
         if job_name in existing_jobs:
-            response = input(
-                f"⚠️ Job '{job_name}' already exists. Overwrite? (y/n): ").strip().lower()
+            response = input(f"⚠️ Job '{job_name}' already exists. Overwrite? (y/n): ").strip().lower()
             if response not in ['y', 'yes']:
                 print(f"⏭️ Skipping job creation")
                 return False
@@ -233,8 +222,7 @@ class JenkinsAutomation:
 
         return status
 
-    def _execute_git_operations(self, jenkinsfile_source: Path,
-                                target_branch: str, git_status: Dict) -> bool:
+    def _execute_git_operations(self, jenkinsfile_source: Path, target_branch: str, git_status: Dict) -> bool:
         """Execute git add, commit, and push operations"""
 
         try:
@@ -245,8 +233,7 @@ class JenkinsAutomation:
             print(f"   ✅ Copied to: {jenkinsfile_dest}")
 
             # Create new branch if needed
-            if not git_status['has_jenkinsfile'] and target_branch != \
-                    git_status['current_branch']:
+            if target_branch != git_status['current_branch']:
                 print(f"🌿 Creating new branch: {target_branch}")
 
                 # Create and switch to new branch
@@ -263,6 +250,8 @@ class JenkinsAutomation:
                     return False
 
                 print(f"   ✅ Created and switched to: {target_branch}")
+            else:
+                print(f"🔄 Using existing branch: {target_branch}")
 
             # Git add
             print(f"📦 Adding Jenkinsfile to git...")
@@ -294,8 +283,7 @@ class JenkinsAutomation:
             if result.returncode != 0:
                 # Check if it's because there are no changes
                 if "nothing to commit" in result.stdout:
-                    print(
-                        f"   ℹ️ No changes to commit (Jenkinsfile already up to date)")
+                    print(f"   ℹ️ No changes to commit (Jenkinsfile already up to date)")
                 else:
                     print(f"❌ Failed to commit: {result.stderr}")
                     return False
@@ -305,11 +293,15 @@ class JenkinsAutomation:
             # Git push
             print(f"🚀 Pushing to remote...")
 
-            # Push with upstream set if it's a new branch
+            # For new branches, we need to set upstream and push
             if target_branch != git_status['current_branch']:
-                push_cmd = ['git', 'push', '-u', 'origin', target_branch]
+                # Push new branch with upstream tracking
+                push_cmd = ['git', 'push', '--set-upstream', 'origin', target_branch]
+                print(f"   📤 Setting upstream and pushing new branch...")
             else:
+                # Push to existing branch
                 push_cmd = ['git', 'push']
+                print(f"   📤 Pushing to existing branch...")
 
             result = subprocess.run(
                 push_cmd,
@@ -321,8 +313,9 @@ class JenkinsAutomation:
 
             if result.returncode != 0:
                 print(f"❌ Failed to push: {result.stderr}")
-                print(
-                    f"💡 You may need to push manually: git push {' '.join(push_cmd[2:])}")
+                print(f"💡 You may need to push manually:")
+                print(f"   cd {self.local_repo_path}")
+                print(f"   git push --set-upstream origin {target_branch}")
                 return False
 
             print(f"   ✅ Pushed to origin/{target_branch}")
@@ -345,8 +338,7 @@ class JenkinsAutomation:
             jobs_output = self.jenkins_cli._run_cli_command(['list-jobs'])
             if jobs_output:
                 # Parse job names from output
-                jobs = [line.strip() for line in jobs_output.split('\n') if
-                        line.strip()]
+                jobs = [line.strip() for line in jobs_output.split('\n') if line.strip()]
                 return jobs
             else:
                 print(f"⚠️ Could not retrieve Jenkins jobs")
@@ -365,11 +357,14 @@ class JenkinsAutomation:
             # Read the XML configuration
             config_content = config_file.read_text(encoding='utf-8')
 
+            # Debug: Show XML size and first few lines
+            print(f"   📄 XML config size: {len(config_content)} characters")
+            lines = config_content.split('\n')[:5]
+            print(f"   📝 First few lines: {lines}")
+
             # Create job using Jenkins CLI
-            # First, delete job if it exists
-            delete_result = self.jenkins_cli._run_cli_command(
-                ['delete-job', job_name])
-            # Don't worry if delete fails (job might not exist)
+            # Skip delete attempt since it's causing issues
+            print(f"   🔧 Creating job directly...")
 
             # Create new job
             create_cmd = ['create-job', job_name]
@@ -383,8 +378,7 @@ class JenkinsAutomation:
 
                 # Add authentication if available
                 if self.jenkins_cli.username and self.jenkins_cli.token:
-                    cmd.extend(['-auth',
-                                f'{self.jenkins_cli.username}:{self.jenkins_cli.token}'])
+                    cmd.extend(['-auth', f'{self.jenkins_cli.username}:{self.jenkins_cli.token}'])
 
                 cmd.extend(create_cmd)
 
@@ -398,12 +392,15 @@ class JenkinsAutomation:
 
                 if result.returncode == 0:
                     print(f"   ✅ Job created successfully: {job_name}")
-                    print(
-                        f"   🔗 Access at: {self.jenkins_cli.jenkins_url}/job/{job_name}/")
+                    print(f"   🔗 Access at: {self.jenkins_cli.jenkins_url}/job/{job_name}/")
                     return True
                 else:
                     print(f"   ❌ Failed to create job: {result.stderr}")
-                    return False
+                    print(f"   📋 Stdout: {result.stdout}")
+
+                    # Try creating a minimal pipeline job as fallback
+                    print(f"   🔄 Trying fallback: minimal pipeline job...")
+                    return self._create_minimal_pipeline_job(job_name)
 
             except subprocess.TimeoutExpired:
                 print(f"   ⏰ Job creation timed out")
@@ -411,6 +408,85 @@ class JenkinsAutomation:
 
         except Exception as e:
             print(f"❌ Error creating Jenkins job: {e}")
+            return False
+
+    def _create_minimal_pipeline_job(self, job_name: str) -> bool:
+        """Create a minimal pipeline job as fallback"""
+
+        try:
+            print(f"   🛠️ Creating minimal pipeline job...")
+
+            # Minimal pipeline job XML
+            minimal_xml = f"""<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.40">
+  <actions/>
+  <description>Jenkins pipeline for {self.repo_analysis.get('repo_name', job_name)}</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>10</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@2.80">
+    <scm class="hudson.plugins.git.GitSCM" plugin="git@4.8.3">
+      <configVersion>2</configVersion>
+      <userRemoteConfigs>
+        <hudson.plugins.git.UserRemoteConfig>
+          <url>{self.repo_analysis.get('repo_url', '')}</url>
+        </hudson.plugins.git.UserRemoteConfig>
+      </userRemoteConfigs>
+      <branches>
+        <hudson.plugins.git.BranchSpec>
+          <name>*/main</name>
+        </hudson.plugins.git.BranchSpec>
+      </branches>
+      <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+      <submoduleCfg class="list"/>
+      <extensions/>
+    </scm>
+    <scriptPath>Jenkinsfile</scriptPath>
+    <lightweight>true</lightweight>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>"""
+
+            # Create job with minimal XML
+            cmd = [
+                'java', '-jar', self.jenkins_cli.cli_jar,
+                '-s', self.jenkins_cli.jenkins_url
+            ]
+
+            if self.jenkins_cli.username and self.jenkins_cli.token:
+                cmd.extend(['-auth', f'{self.jenkins_cli.username}:{self.jenkins_cli.token}'])
+
+            cmd.extend(['create-job', job_name])
+
+            result = subprocess.run(
+                cmd,
+                input=minimal_xml,
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+
+            if result.returncode == 0:
+                print(f"   ✅ Minimal pipeline job created successfully!")
+                print(f"   🔗 Access at: {self.jenkins_cli.jenkins_url}/job/{job_name}/")
+                print(f"   📝 Note: Job created with basic configuration")
+                print(f"   💡 You can customize it further in Jenkins UI")
+                return True
+            else:
+                print(f"   ❌ Minimal job creation also failed: {result.stderr}")
+                return False
+
+        except Exception as e:
+            print(f"   ❌ Error creating minimal job: {e}")
             return False
 
     def _parse_plugins_xml(self, plugins_file: Path) -> List[Dict]:
@@ -432,8 +508,7 @@ class JenkinsAutomation:
                 # Parse name@version format
                 if '@' in match:
                     name, version = match.split('@', 1)
-                    plugins.append(
-                        {'name': name.strip(), 'version': version.strip()})
+                    plugins.append({'name': name.strip(), 'version': version.strip()})
                 else:
                     plugins.append({'name': match.strip(), 'version': 'latest'})
 
@@ -458,8 +533,7 @@ class JenkinsAutomation:
 
                 print(f"   📦 Installing: {plugin_spec}")
 
-                result = self.jenkins_cli._run_cli_command(
-                    ['install-plugin', plugin_spec])
+                result = self.jenkins_cli._run_cli_command(['install-plugin', plugin_spec])
 
                 if result is not None:
                     print(f"      ✅ Installed: {plugin['name']}")
@@ -469,18 +543,15 @@ class JenkinsAutomation:
 
             if success_count == len(plugins):
                 print(f"🎉 All plugins installed successfully!")
-                print(
-                    f"⚠️ Jenkins may need to be restarted for plugins to take effect")
+                print(f"⚠️ Jenkins may need to be restarted for plugins to take effect")
 
-                restart_response = input(
-                    f"🔄 Restart Jenkins now? (y/n): ").strip().lower()
+                restart_response = input(f"🔄 Restart Jenkins now? (y/n): ").strip().lower()
                 if restart_response in ['y', 'yes']:
                     self._restart_jenkins()
 
                 return True
             elif success_count > 0:
-                print(
-                    f"⚠️ Partial success: {success_count}/{len(plugins)} plugins installed")
+                print(f"⚠️ Partial success: {success_count}/{len(plugins)} plugins installed")
                 return True
             else:
                 print(f"❌ No plugins were installed successfully")

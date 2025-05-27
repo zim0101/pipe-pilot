@@ -115,10 +115,20 @@ class LocalRepositoryAnalyzer:
         # Extract repository info from URL
         if repo_url.startswith('https://github.com/'):
             repo_path = repo_url.replace('https://github.com/', '').rstrip('/')
+        elif repo_url.startswith('git@github.com:'):
+            # Handle SSH URLs like git@github.com:user/repo.git
+            repo_path = repo_url.replace('git@github.com:', '').rstrip('/').replace('.git', '')
         else:
             repo_path = repo_url.rstrip('/')
 
-        owner, repo_name = repo_path.split('/')
+        # Split owner and repo name
+        if '/' in repo_path:
+            owner, repo_name = repo_path.split('/', 1)
+        else:
+            # Fallback if no slash found
+            owner = 'unknown'
+            repo_name = repo_path
+
         local_repo_path = self.repos_dir / f"{owner}_{repo_name}"
 
         print(f"📂 Repository: {owner}/{repo_name}")
