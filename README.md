@@ -288,10 +288,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **OpenRouter** for providing access to multiple AI models
+- **Dynamic Solution Innovators Ltd.** for organizing the AI Hackathon and providing us with the OpenRouter API key, which grants unlimited access to powerful models. 
 - **Jenkins** community for the amazing CI/CD platform
 - **Anthropic** for Claude AI models
-- **GitHub** for hosting and Git integration
 
 ## 🔗 Links
 
