@@ -72,8 +72,8 @@ class JenkinsAutomation:
         print(f"   🔸 Uncommitted changes: {'✅' if git_status['has_changes'] else '❌'}")
 
         # Ask user for confirmation
-        response = input(f"\n📝 Do you want to commit and push the Jenkinsfile? (y/n): ").strip().lower()
-        if response not in ['y', 'yes']:
+        response = input(f"\n📝 Do you want to commit and push the Jenkinsfile? (Y/n): ").strip().lower()
+        if response not in ['', 'y', 'yes']:
             print(f"⏭️ Skipping git automation")
             return False
 
@@ -125,8 +125,8 @@ class JenkinsAutomation:
 
         # Warn if job exists
         if job_name in existing_jobs:
-            response = input(f"⚠️ Job '{job_name}' already exists. Overwrite? (y/n): ").strip().lower()
-            if response not in ['y', 'yes']:
+            response = input(f"⚠️ Job '{job_name}' already exists. Overwrite? (Y/n): ").strip().lower()
+            if response not in ['', 'y', 'yes']:
                 print(f"⏭️ Skipping job creation")
                 return False
 
@@ -156,8 +156,8 @@ class JenkinsAutomation:
             print(f"   • {plugin['name']} ({plugin['version']})")
 
         # Ask for confirmation
-        response = input(f"\n📝 Install these plugins? (y/n): ").strip().lower()
-        if response not in ['y', 'yes']:
+        response = input(f"\n📝 Install these plugins? (Y/n): ").strip().lower()
+        if response not in ['', 'y', 'yes']:
             print(f"⏭️ Skipping plugin installation")
             return False
 
@@ -545,8 +545,8 @@ class JenkinsAutomation:
                 print(f"🎉 All plugins installed successfully!")
                 print(f"⚠️ Jenkins may need to be restarted for plugins to take effect")
 
-                restart_response = input(f"🔄 Restart Jenkins now? (y/n): ").strip().lower()
-                if restart_response in ['y', 'yes']:
+                restart_response = input(f"🔄 Restart Jenkins now? (Y/n): ").strip().lower()
+                if restart_response in ['', 'y', 'yes']:
                     self._restart_jenkins()
 
                 return True
