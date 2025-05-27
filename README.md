@@ -60,14 +60,20 @@ Pipe Pilot is a revolutionary AI-powered tool that automatically generates compl
 
 ```bash
 # Clone the repository
-git clone https://github.com/zim0101/ai-jenkins-pipeline-agent.git
-cd ai-jenkins-pipeline-agent
+git clone git@github.com:zim0101/pipe-pilot.git
+cd pipe-pilot
+
+# Create virtual environment and activate
+python3 -m venv .venv
+source .venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Set up environment
-cp .env.example .env
+vim .env
+or 
+touch .env
 ```
 
 ### Configuration
