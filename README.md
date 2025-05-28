@@ -122,7 +122,11 @@ JENKINS_TOKEN=your_jenkins_api_token
 # Optional
 JENKINS_CLI_JAR=./jenkins-cli.jar
 ```
-
+### Download your Jenkins CLI jar
+```bash
+# Download Jenkins CLI jar
+wget http://127.0.0.1:9090/jnlpJars/jenkins-cli.jar
+```
 #### 🔑 Getting API Keys
 
 1. **OpenRouter API Key**:
